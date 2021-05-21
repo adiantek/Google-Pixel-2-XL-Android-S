@@ -197,3 +197,6 @@ OUT_DIR=out
 PRODUCT_SOONG_NAMESPACES=device/google/taimen device/google/wahoo vendor/google/camera hardware/google/camera hardware/google/pixel hardware/qcom/msm8998 vendor/qcom/taimen/proprietary
 ============================================
 ```
+
+## Create update.zip
+Go to out/target/product/taimen/images and type `zip update.zip android-info.txt boot.img dtbo.img vbmeta.img system.img system_other.img vendor.img`. Now you can flash update.zip with `fastboot -w flash update.zip`. Optionally, you can flash bootloader.img and radio.img using `fastboot flash bootloader/radio bootloader/radio.img` (you can't flash bootloader/radio using ZIP).
