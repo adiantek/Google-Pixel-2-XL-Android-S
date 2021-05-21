@@ -200,3 +200,16 @@ PRODUCT_SOONG_NAMESPACES=device/google/taimen device/google/wahoo vendor/google/
 
 ## Create update.zip
 Go to out/target/product/taimen/images and type `zip update.zip android-info.txt boot.img dtbo.img vbmeta.img system.img system_other.img vendor.img`. Now you can flash update.zip with `fastboot -w flash update.zip`. Optionally, you can flash bootloader.img and radio.img using `fastboot flash bootloader/radio bootloader/radio.img` (you can't flash bootloader/radio using ZIP).
+
+## Modify system.img before flashing
+You must unset unshare_blocks from system.img to mount it with rw:
+```
+simg2img system.img system.raw.img
+e2fsck -y -E unshare_blocks system.raw.img
+mkdir system/
+mount system.raw.img system/
+# modify your system, for testing I recommend set ro.adb.secure=0 in system/build.prop to get logcat access
+umount system/
+img2simg system.raw.img system.img
+fastboot flash system system.img
+```
