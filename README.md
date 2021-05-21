@@ -213,3 +213,6 @@ umount system/
 img2simg system.raw.img system.img
 fastboot flash system system.img
 ```
+
+## How to undo everything?
+Download https://dl.google.com/dl/android/aosp/taimen-rp1a.201005.004.a1-factory-2f5c4987.zip and flash it using `flash-all.bat`/`flash-all.sh`.
