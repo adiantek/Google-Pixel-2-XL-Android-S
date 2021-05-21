@@ -142,6 +142,33 @@ E         : c5      1 libprocessgroup: Failed to mount memory cgroup: No such fi
 W         : c5      1 libprocessgroup: Failed to setup memory cgroup
 ```
 PS. I reported it: https://issuetracker.google.com/issues/188695839
+## bpfloader
+When I flashed I saw in logcat:
+```
+E bpfloader: Failed to load object: /apex/com.android.tethering/etc/bpf/offload.o, ret: Function not implemented
+E bpfloader: === CRITICAL FAILURE LOADING BPF PROGRAMS FROM /apex/com.android.tethering/etc/bpf/ ===
+E bpfloader: If this triggers reliably, you're probably missing kernel options or patches.
+E bpfloader: If this triggers randomly, you might be hitting some memory allocation problems or startup script race.
+E bpfloader: --- DO NOT EXPECT SYSTEM TO BOOT SUCCESSFULLY ---
+```
+Unfortunately, netd can't start if bpf.progs_loaded will not set. I removed sleep and return from: https://android.googlesource.com/platform/system/bpf/+/67fa2073ffbeb0baa6ad20cc9f309853efb1b536/bpfloader/BpfLoader.cpp#124
+```diff
+ubuntu@android:~/android/system/bpf$ git diff
+diff --git a/bpfloader/BpfLoader.cpp b/bpfloader/BpfLoader.cpp
+index 7a68894..0ad8f2a 100644
+--- a/bpfloader/BpfLoader.cpp
++++ b/bpfloader/BpfLoader.cpp
+@@ -121,8 +121,6 @@ int main() {
+             ALOGE("If this triggers randomly, you might be hitting some memory allocation "
+                   "problems or startup script race.");
+             ALOGE("--- DO NOT EXPECT SYSTEM TO BOOT SUCCESSFULLY ---");
+-            sleep(20);
+-            return 2;
+         }
+     }
+```
+If you want fix it properly I give you a hint - there is a loader: https://android.googlesource.com/platform/system/bpf/+/67fa2073ffbeb0baa6ad20cc9f309853efb1b536/libbpf_android/Loader.cpp#688
+
 ## Build it!
 Type `RELAX_USES_LIBRARY_CHECK=true m` and wait. We must use RELAX_USES_LIBRARY_CHECK because vendor/qcom/taimen/proprietary/ims.apk requires com.qti.vzw.ims.internal.
 ```
